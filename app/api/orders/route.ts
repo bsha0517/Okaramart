@@ -168,14 +168,14 @@ export async function POST(req: NextRequest) {
 
   if (customer?.email) {
     const { subject, html } = orderPlacedEmail(orderForEmail);
-    sendEmail(customer.email, subject, html).catch(() => {});
+    sendEmail(customer.email, subject, html).catch((err) => console.error("[email] order-placed send failed:", err));
   }
   const opsTemplate = newOrderOpsEmail({
     ...orderForEmail,
     customerName: customer?.name ?? "Customer",
     customerPhone: customer?.phone,
   });
-  sendOperationsEmail(opsTemplate.subject, opsTemplate.html).catch(() => {});
+  sendOperationsEmail(opsTemplate.subject, opsTemplate.html).catch((err) => console.error("[email] ops notification send failed:", err));
 
   return NextResponse.json({
     orderId: order.id,

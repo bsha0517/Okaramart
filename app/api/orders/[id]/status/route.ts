@@ -87,10 +87,10 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
     if (status === "CONFIRMED") {
       const { subject, html } = orderConfirmedEmail(orderForEmail);
-      sendEmail(updated.customer.email, subject, html).catch(() => {});
+      sendEmail(updated.customer.email, subject, html).catch((err) => console.error("[email] order-confirmed send failed:", err));
     } else if (status === "DELIVERED") {
       const { subject, html } = orderDeliveredEmail(orderForEmail);
-      sendEmail(updated.customer.email, subject, html).catch(() => {});
+      sendEmail(updated.customer.email, subject, html).catch((err) => console.error("[email] order-delivered send failed:", err));
     }
   }
 

@@ -34,7 +34,10 @@ export async function sendEmail(to: string, subject: string, html: string): Prom
       }),
     });
     if (!res.ok) {
-      throw new Error(`Resend email failed: ${await res.text()}`);
+      const errorBody = await res.text();
+      // eslint-disable-next-line no-console
+      console.error(`[email] Resend API rejected send to ${to} (status ${res.status}): ${errorBody}`);
+      throw new Error(`Resend email failed: ${errorBody}`);
     }
     return;
   }
