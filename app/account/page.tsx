@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getCustomerSession } from "@/lib/customerSession";
 import { redirect } from "next/navigation";
+import LogoutButton from "@/components/LogoutButton";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +30,10 @@ export default async function AccountPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       <h1 className="font-display text-3xl text-canal mb-1">My account</h1>
-      <p className="text-char/60 mb-8">{user.name} · {user.phone}{user.email ? ` · ${user.email}` : ""}</p>
+      <div className="flex items-center justify-between mb-8">
+        <p className="text-char/60">{user.name} · {user.phone}{user.email ? ` · ${user.email}` : ""}</p>
+        <LogoutButton />
+      </div>
 
       <section className="mb-10">
         <h2 className="font-medium mb-3">Saved addresses</h2>

@@ -144,6 +144,29 @@ Collection tables):
    with placeholder fees. Adjust to your real coverage area and rider
    capacity.
 
+## Customer login: password instead of OTP
+
+Customer signup/login now uses **phone + password** (`/api/auth/password/*`),
+not SMS OTP — this avoids per-message SMS gateway costs entirely, since
+account creation and login never send a text message. The OTP code
+(`/api/auth/otp/*`, `lib/sms.ts`) is still in the codebase, just unused —
+switch back any time by swapping `components/AuthFlow.tsx` to call the
+OTP endpoints instead once you have a cheap SMS deal or want the extra
+verification a code provides.
+
+**Trade-off to know about**: password-only signup doesn't verify the
+phone number is real or reachable — someone could sign up with any
+number. This matters less than it sounds for this app, since:
+- COD orders still require an OTP typed to the rider at the door
+  (unrelated to login — that's still enforced)
+- Fake accounts can't do much damage without a real delivery address
+- You can always add OTP verification back for signup specifically,
+  while keeping password login for return visits, if this becomes a
+  problem
+
+**Also new**: `/api/auth/logout` and a "Log out" button on `/account` —
+these didn't really make sense with OTP-only sessions but do now.
+
 ## Performance notes
 
 If the site feels slow, check these in order — they're usually the whole story for an app like this:
