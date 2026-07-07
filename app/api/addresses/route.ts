@@ -8,8 +8,8 @@ export const preferredRegion = "sin1"; // match your Supabase region
 
 const AddressSchema = z.object({
   label: z.string().default("Home"),
-  addressLine: z.string().min(3),
-  area: z.string().min(2),
+  addressLine: z.string().min(3, "Please enter a house/street address (at least 3 characters)"),
+  area: z.string().min(2, "Please enter your area in Okara (e.g. Model Town)"),
   lat: z.number().optional(),
   lng: z.number().optional(),
 });
@@ -21,7 +21,8 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const parsed = AddressSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+    const message = parsed.error.errors[0]?.message || "Please check your address details";
+    return NextResponse.json({ error: message }, { status: 400 });
   }
 
   const address = await prisma.address.create({

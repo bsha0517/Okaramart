@@ -11,6 +11,19 @@ const MapLocationPicker = dynamic(() => import("@/components/GoogleMapLocationPi
 
 type PaymentMethod = "JAZZCASH" | "EASYPAISA" | "COD";
 
+/** Safety net: if an API ever returns an error as an object instead of a
+ * string, this pulls out something readable instead of "[object Object]". */
+function readableError(err: unknown, fallback: string): string {
+  if (typeof err === "string") return err;
+  if (err && typeof err === "object") {
+    const anyErr = err as any;
+    if (anyErr.formErrors?.[0]) return anyErr.formErrors[0];
+    const firstFieldError = Object.values(anyErr.fieldErrors ?? {})[0];
+    if (Array.isArray(firstFieldError) && firstFieldError[0]) return firstFieldError[0];
+  }
+  return fallback;
+}
+
 export default function CheckoutPage() {
   const { items, clear } = useCartStore();
   const [method, setMethod] = useState<PaymentMethod>("COD");
@@ -26,6 +39,18 @@ export default function CheckoutPage() {
   async function placeOrder() {
     setLoading(true);
     setError(null);
+
+    if (address.addressLine.trim().length < 3) {
+      setError("Please enter a house/street address (at least 3 characters)");
+      setLoading(false);
+      return;
+    }
+    if (address.area.trim().length < 2) {
+      setError("Please enter your area in Okara (e.g. Model Town)");
+      setLoading(false);
+      return;
+    }
+
     try {
       // Saves/reuses an address for the logged-in customer (session cookie
       // is read server-side), then creates the order against it.
@@ -44,7 +69,7 @@ export default function CheckoutPage() {
         return;
       }
       const addressData = await addressRes.json();
-      if (!addressRes.ok) throw new Error(addressData.error || "Could not save address");
+      if (!addressRes.ok) throw new Error(readableError(addressData.error, "Could not save address"));
 
       if ((method === "JAZZCASH" || method === "EASYPAISA") && !/^03\d{9}$/.test(payerPhone)) {
         setError("Enter a valid mobile number for JazzCash/EasyPaisa, e.g. 03001234567");
@@ -63,7 +88,7 @@ export default function CheckoutPage() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Order failed");
+      if (!res.ok) throw new Error(readableError(data.error, "Order failed"));
 
       if (data.payment.type === "redirect") {
         // Build a hidden form and auto-submit to the wallet's hosted page
@@ -96,14 +121,16 @@ export default function CheckoutPage() {
 
       <div className="mb-6 space-y-3">
         <input
+          required
           className="w-full border border-canal/20 rounded-lg px-3 py-2"
           placeholder="House / street address"
           value={address.addressLine}
           onChange={(e) => setAddress({ ...address, addressLine: e.target.value })}
         />
         <input
+          required
           className="w-full border border-canal/20 rounded-lg px-3 py-2"
-          placeholder="Area in Okara (e.g. Model Town, Railway Colony)"
+          placeholder="Area in Okara (e.g. Model Town, Railway Colony) — required"
           value={address.area}
           onChange={(e) => setAddress({ ...address, area: e.target.value })}
         />

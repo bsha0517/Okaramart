@@ -16,7 +16,7 @@ const CreateOrderSchema = z.object({
   notes: z.string().optional(),
   // Needed for JazzCash/EasyPaisa when the account (e.g. Google/Facebook
   // signup) has no phone on file — falls back to the account's phone if set.
-  payerPhone: z.string().regex(/^03\d{9}$/).optional(),
+  payerPhone: z.string().regex(/^03\d{9}$/, "Enter a valid mobile number, e.g. 03001234567").optional(),
 });
 
 function generateOrderNumber() {
@@ -35,7 +35,8 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const parsed = CreateOrderSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+    const message = parsed.error.errors[0]?.message || "Please check your order details";
+    return NextResponse.json({ error: message }, { status: 400 });
   }
   const { addressId, items, paymentMethod, couponCode, deliverySlot, notes, payerPhone } = parsed.data;
 
