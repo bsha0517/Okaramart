@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
+export const preferredRegion = "sin1"; // match your Supabase region
 
 const CouponSchema = z.object({
   code: z.string().min(3).transform((s) => s.toUpperCase()),

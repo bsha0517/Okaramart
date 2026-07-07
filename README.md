@@ -144,6 +144,43 @@ Collection tables):
    with placeholder fees. Adjust to your real coverage area and rider
    capacity.
 
+## Performance notes
+
+If the site feels slow, check these in order — they're usually the whole story for an app like this:
+
+1. **Region mismatch between Vercel and Supabase.** This is the most
+   common cause of "everything feels sluggish." Every database query
+   crosses the network between where your function runs and where
+   Supabase lives — if they're on different continents, that's
+   200-300ms added to *every single query*, and a page like the
+   homepage makes several. Fix:
+   - Check your Supabase project's region: Supabase dashboard →
+     Settings → General.
+   - `app/layout.tsx` now exports `preferredRegion` (set to `"sin1"` —
+     Singapore — matching the `ap-southeast-1` host seen in earlier
+     deployment logs). **Update this if your Supabase project is
+     actually in a different region.** Vercel region codes:
+     `iad1` (US East), `sin1` (Singapore), `hnd1` (Tokyo), `fra1`
+     (Frankfurt), `syd1` (Sydney), etc.
+   - All API routes under `app/api/` also export `preferredRegion` now,
+     since route handlers don't inherit it from the layout.
+   - On Vercel Pro/Enterprise, also check Project Settings → Functions →
+     Region to make sure it isn't overriding the per-file setting.
+2. **Batched queries.** The homepage used to run one database query
+   *per category row* (N+1) — now it runs one query total for all
+   category rows, plus one for collections, in parallel. If you add
+   more homepage sections later, keep this pattern: fetch once, group
+   in memory, rather than querying inside each row component.
+3. **Images aren't optimized yet** — product/category images use plain
+   `<img>` tags rather than `next/image`, so there's no automatic
+   resizing/lazy-loading/format conversion. Worth migrating once your
+   real product photos are in, especially if they're large files.
+4. **Cold starts** — the very first request after a period of no
+   traffic will always be slower (serverless functions + a fresh
+   Prisma connection). This is normal and not fixable without paying
+   for constantly-warm infrastructure; it shouldn't affect back-to-back
+   requests.
+
 ## Deployment gotchas (learned the hard way)
 
 - **Use Supabase's pooler connection string**, not the direct one. Vercel's

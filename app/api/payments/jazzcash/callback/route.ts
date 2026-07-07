@@ -3,6 +3,7 @@ import { jazzCashProvider } from "@/lib/payments/jazzcash";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+export const preferredRegion = "sin1"; // match your Supabase region
 
 export async function POST(req: NextRequest) {
   const form = await req.formData();

@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { parseCsv } from "@/lib/csv";
 
 export const dynamic = "force-dynamic";
+export const preferredRegion = "sin1"; // match your Supabase region
 
 function slugify(s: string) {
   return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");

@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { sendSms } from "@/lib/sms";
 
 export const dynamic = "force-dynamic";
+export const preferredRegion = "sin1"; // match your Supabase region
 
 const ALLOWED_TRANSITIONS: Record<string, string[]> = {
   PACKER: ["PACKING", "PACKED"],

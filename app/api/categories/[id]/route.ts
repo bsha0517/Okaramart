@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+export const preferredRegion = "sin1"; // match your Supabase region
 
 function canManage(role: string | undefined) {
   return role === "SUPER_ADMIN" || role === "MANAGER";

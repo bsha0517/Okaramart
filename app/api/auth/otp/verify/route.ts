@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { SignJWT } from "jose";
 
 export const dynamic = "force-dynamic";
+export const preferredRegion = "sin1"; // match your Supabase region
 
 const VerifyOtpSchema = z.object({
   phone: z.string().regex(/^03\d{9}$/),

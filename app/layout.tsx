@@ -9,6 +9,14 @@ import SearchBar from "@/components/SearchBar";
 import LocationSelector from "@/components/LocationSelector";
 import SocialLinks from "@/components/SocialLinks";
 
+// IMPORTANT: match this to whatever region your Supabase project is in.
+// Your DB host (aws-1-ap-southeast-1.pooler.supabase.com) is Singapore —
+// so functions run in Singapore too, instead of Vercel's US default,
+// which otherwise adds ~250-300ms of pure network latency to EVERY query.
+// Check yours: Supabase dashboard → Settings → General → region.
+// Vercel region codes: sin1 (Singapore), hnd1 (Tokyo), syd1 (Sydney), etc.
+export const preferredRegion = "sin1";
+
 export const metadata: Metadata = {
   title: "Okara Mart — Groceries delivered fast in Okara",
   description: "Your local dark store for Okara. Groceries, essentials, delivered in minutes.",

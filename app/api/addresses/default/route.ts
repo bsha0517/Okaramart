@@ -3,6 +3,7 @@ import { getCustomerSession } from "@/lib/customerSession";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+export const preferredRegion = "sin1"; // match your Supabase region
 
 export async function GET() {
   const session = await getCustomerSession();

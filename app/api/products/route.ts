@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
+export const preferredRegion = "sin1"; // match your Supabase region
 
 const ProductSchema = z.object({
   name: z.string().min(1),

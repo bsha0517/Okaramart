@@ -5,6 +5,7 @@ import { getPaymentProvider } from "@/lib/payments";
 import { getCustomerSession } from "@/lib/customerSession";
 
 export const dynamic = "force-dynamic";
+export const preferredRegion = "sin1"; // match your Supabase region
 
 const CreateOrderSchema = z.object({
   addressId: z.string(),

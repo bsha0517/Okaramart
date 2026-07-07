@@ -1,21 +1,21 @@
-import { prisma } from "@/lib/prisma";
 import ProductCard from "./ProductCard";
 
-export default async function CategoryProductRow({
-  categoryId,
+/**
+ * Purely presentational now — takes pre-fetched products instead of
+ * querying the database itself. Querying per-row used to mean one DB
+ * round-trip per category on the homepage (N+1), which is expensive
+ * even locally and painful across regions. The homepage now does ONE
+ * batched query for all categories and passes the relevant slice here.
+ */
+export default function CategoryProductRow({
+  products,
   categoryName,
   categorySlug,
 }: {
-  categoryId: string;
+  products: any[];
   categoryName: string;
   categorySlug: string;
 }) {
-  const products = await prisma.product.findMany({
-    where: { categoryId, isActive: true },
-    take: 10,
-    orderBy: { updatedAt: "desc" },
-  });
-
   if (products.length === 0) return null;
 
   return (

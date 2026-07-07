@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getCustomerSession } from "@/lib/customerSession";
 
 export const dynamic = "force-dynamic";
+export const preferredRegion = "sin1"; // match your Supabase region
 
 const AddressSchema = z.object({
   label: z.string().default("Home"),
