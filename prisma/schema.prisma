@@ -200,6 +200,19 @@ model Payment {
 
 // ---------- MARKETING ----------
 
+// Promotional banners shown on the homepage — fully admin-managed
+model Banner {
+  id        String   @id @default(cuid())
+  title     String
+  subtitle  String?
+  imageUrl  String?
+  linkUrl   String?  // where tapping the banner goes, e.g. /?category=snacks
+  bgColor   String   @default("#0F3D3E") // fallback background if no image
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
 model Coupon {
   id            String   @id @default(cuid())
   code          String   @unique

@@ -24,6 +24,18 @@ role-based admin panel, and JazzCash / EasyPaisa / Cash-on-Delivery checkout.
 - **Database schema**: products, orders, delivery zones (per Okara
   neighborhood), coupons, reviews, order status history, OTP codes
 
+- **Full quick-commerce homepage**: delivery-time badge, value-prop
+  strip, scrollable category carousel, admin-managed promo banners, and
+  per-category horizontal product rows with "See All" — matching the
+  Zepto/Blinkit-style layout
+- **Admin-managed banners** (`/admin/banners`): add/reorder/hide
+  homepage promo banners without touching code — requires running
+  `prisma/manual-setup/03_add_banners.sql` once in Supabase (new
+  database, skip straight to step 3 below; existing database, just run
+  this one file)
+- **Working search** in the header — searches product names, results
+  show on the homepage at `/?q=...`
+
 ## What you still need to do before going live
 
 1. **Get real payment credentials.** Apply for JazzCash and EasyPaisa
