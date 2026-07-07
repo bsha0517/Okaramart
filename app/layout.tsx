@@ -21,6 +21,7 @@ export const preferredRegion = "sin1";
 export const metadata: Metadata = {
   title: "Okara Mart — Groceries delivered fast in Okara",
   description: "Your local dark store for Okara. Groceries, essentials, delivered in minutes.",
+  icons: { icon: "/logo.png" },
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -31,8 +32,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <header className="border-b border-canal/10 bg-husk sticky top-0 z-40">
           <div className="max-w-6xl mx-auto flex items-center gap-4 px-4 py-3">
-            <a href="/" className="shrink-0">
-              <p className="font-display text-2xl text-canal tracking-tight leading-none">Okara Mart</p>
+            <a href="/" className="shrink-0 flex flex-col items-start">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt="Okara Mart" className="h-11 w-auto" />
               <p className="text-[11px] text-char/50 leading-none mt-0.5">Delivery in minutes*</p>
             </a>
 
@@ -60,7 +62,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <footer className="mt-16 border-t border-canal/10 py-10 bg-white">
           <div className="max-w-6xl mx-auto px-4 grid grid-cols-2 md:grid-cols-5 gap-8">
             <div className="col-span-2 md:col-span-1">
-              <p className="font-display text-xl text-canal mb-3">Okara Mart</p>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt="Okara Mart" className="h-10 w-auto mb-3" />
               <p className="text-xs text-char/50 mb-4">
                 Serving Okara city only. A local dark store for groceries and daily essentials.
               </p>
