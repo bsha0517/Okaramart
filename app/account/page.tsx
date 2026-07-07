@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getUnifiedCustomerSession } from "@/lib/customerSession";
 import { redirect } from "next/navigation";
 import LogoutButton from "@/components/LogoutButton";
+import UpdateEmailForm from "@/components/UpdateEmailForm";
 
 export const dynamic = "force-dynamic";
 
@@ -30,9 +31,15 @@ export default async function AccountPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       <h1 className="font-display text-3xl text-canal mb-1">My account</h1>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-3">
         <p className="text-char/60">{user.name} · {user.phone}{user.email ? ` · ${user.email}` : ""}</p>
         <LogoutButton />
+      </div>
+      <div className="mb-8">
+        <UpdateEmailForm currentEmail={user.email} />
+        {!user.email && (
+          <p className="text-xs text-char/40 mt-1">Add an email to receive order confirmations and delivery updates.</p>
+        )}
       </div>
 
       <section className="mb-10">
