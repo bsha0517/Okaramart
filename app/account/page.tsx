@@ -60,7 +60,7 @@ export default async function AccountPage() {
         ) : (
           <div className="space-y-3">
             {orders.map((o) => (
-              <div key={o.id} className="bg-white border border-canal/10 rounded-lg p-4">
+              <a key={o.id} href={`/orders/${o.id}`} className="block bg-white border border-canal/10 rounded-lg p-4 hover:border-canal/30">
                 <div className="flex justify-between items-start mb-1">
                   <p className="font-medium">{o.orderNumber}</p>
                   <span className="text-xs bg-canal/10 text-canal rounded-full px-2 py-1 font-medium">
@@ -70,7 +70,8 @@ export default async function AccountPage() {
                 <p className="text-xs text-char/50">
                   {o.items.length} items · Rs {Number(o.total).toFixed(0)} · {new Date(o.createdAt).toLocaleDateString()}
                 </p>
-              </div>
+                <p className="text-xs text-canal font-medium mt-1">View items & tracking →</p>
+              </a>
             ))}
           </div>
         )}
