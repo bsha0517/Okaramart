@@ -38,6 +38,31 @@ role-based admin panel, and JazzCash / EasyPaisa / Cash-on-Delivery checkout.
 
 ## What you still need to do before going live
 
+**New in this round:**
+
+- **Fixed the category breadcrumb bug** — clicking a category from a
+  product page (or anywhere) now goes to a real `/category/[slug]` page
+  instead of back to the homepage. Old `/?category=slug` links still
+  redirect correctly, so nothing breaks if a banner or bookmark uses the
+  old format.
+- **Subcategories now have real pages too** — same route, since
+  categories and subcategories are both just `Category` rows; the page
+  shows a parent breadcrumb when viewing a subcategory, and subcategory
+  chips when viewing a parent.
+- **Category icons** (`lib/categoryIcons.ts`) — emoji fallback per
+  category slug so the storefront looks finished immediately. Add a real
+  image via `/admin/categories` any time and it overrides the emoji
+  automatically — no code change needed.
+- **Sample/mock products** — run `prisma/manual-setup/06_mock_products.sql`
+  once in Supabase to populate ~19 realistic products across your
+  existing categories. Every one has SKU prefixed `MOCK-` and says so in
+  its description. Remove them anytime with the **"Remove sample
+  products"** button on `/admin/inventory`, or manually via:
+  ```sql
+  delete from "Product" where sku like 'MOCK-%';
+  ```
+
+
 **New in this round — run `prisma/manual-setup/05_subcategories_and_homepage_builder.sql`
 in Supabase once** (adds subcategories and seeds the default homepage layout):
 

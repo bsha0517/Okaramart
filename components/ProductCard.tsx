@@ -1,24 +1,26 @@
 "use client";
 
 import { useCartStore } from "./cartStore";
+import { getCategoryIcon } from "@/lib/categoryIcons";
 
-export default function ProductCard({ product }: { product: any }) {
+export default function ProductCard({ product, categorySlug }: { product: any; categorySlug?: string }) {
   const addItem = useCartStore((s) => s.addItem);
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const qtyInCart = useCartStore((s) => s.items.find((i) => i.productId === product.id)?.quantity ?? 0);
 
   const outOfStock = product.stockQty <= 0;
   const hasDiscount = product.compareAtPrice && Number(product.compareAtPrice) > Number(product.price);
+  const slugForIcon = categorySlug ?? product.category?.slug;
 
   return (
     <div className="bg-white rounded-2xl border border-canal/10 p-2.5 flex flex-col relative">
       <a href={`/product/${product.slug}`} className="block">
-        <div className="aspect-square bg-husk rounded-xl mb-2 flex items-center justify-center text-char/30 text-xs overflow-hidden relative">
+        <div className="aspect-square bg-husk rounded-xl mb-2 flex items-center justify-center overflow-hidden relative">
           {product.imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
           ) : (
-            "No image"
+            <span className="text-4xl opacity-40">{getCategoryIcon(slugForIcon ?? "")}</span>
           )}
         </div>
       </a>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { getCategoryIcon } from "@/lib/categoryIcons";
 
 type Category = { id: string; name: string; slug: string; imageUrl?: string | null };
 
@@ -15,13 +16,13 @@ export default function CategoryCarousel({ categories }: { categories: Category[
     <section className="mb-8 relative">
       <div ref={scrollerRef} className="flex gap-5 overflow-x-auto scroll-smooth pb-1 [scrollbar-width:none]">
         {categories.map((c) => (
-          <a key={c.id} href={`/?category=${c.slug}`} className="shrink-0 w-20 text-center group">
-            <div className="w-20 h-20 rounded-2xl bg-white border border-canal/10 overflow-hidden flex items-center justify-center mb-1.5 group-hover:border-canal/30 transition-colors">
+          <a key={c.id} href={`/category/${c.slug}`} className="shrink-0 w-20 text-center group">
+            <div className="w-20 h-20 rounded-2xl bg-wheat/15 border border-canal/10 overflow-hidden flex items-center justify-center mb-1.5 group-hover:border-canal/30 group-hover:bg-wheat/25 transition-colors">
               {c.imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={c.imageUrl} alt={c.name} className="w-full h-full object-cover" />
               ) : (
-                <span className="text-2xl font-display text-canal font-semibold">{c.name.charAt(0)}</span>
+                <span className="text-3xl">{getCategoryIcon(c.slug)}</span>
               )}
             </div>
             <span className="text-xs font-medium text-char leading-tight">{c.name}</span>

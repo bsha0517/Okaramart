@@ -52,7 +52,7 @@ export default function BannerForm() {
         <input placeholder="Image URL (optional)" value={imageUrl}
           onChange={(e) => setImageUrl(e.target.value)}
           className="border border-canal/20 rounded-lg px-3 py-2 text-sm" />
-        <input placeholder="Link — e.g. /?category=snacks" value={linkUrl}
+        <input placeholder="Link — e.g. /category/snacks" value={linkUrl}
           onChange={(e) => setLinkUrl(e.target.value)}
           className="border border-canal/20 rounded-lg px-3 py-2 text-sm" />
       </div>

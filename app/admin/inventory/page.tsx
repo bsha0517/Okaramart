@@ -1,12 +1,16 @@
 import { prisma } from "@/lib/prisma";
+import RemoveMockProductsButton from "@/components/RemoveMockProductsButton";
 
 export const dynamic = "force-dynamic";
 
 export default async function InventoryPage() {
-  const products = await prisma.product.findMany({
-    include: { category: true },
-    orderBy: { updatedAt: "desc" },
-  });
+  const [products, mockCount] = await Promise.all([
+    prisma.product.findMany({
+      include: { category: true },
+      orderBy: { updatedAt: "desc" },
+    }),
+    prisma.product.count({ where: { sku: { startsWith: "MOCK-" } } }),
+  ]);
 
   return (
     <div>
@@ -27,6 +31,8 @@ export default async function InventoryPage() {
           </a>
         </div>
       </div>
+
+      <RemoveMockProductsButton mockCount={mockCount} />
 
       <div className="bg-white rounded-xl border border-canal/10 overflow-hidden">
         <table className="w-full text-sm">

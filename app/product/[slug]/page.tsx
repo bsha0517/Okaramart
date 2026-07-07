@@ -31,7 +31,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
       <nav className="text-sm text-char/50 mb-4 flex items-center gap-1.5">
         <a href="/" className="hover:text-canal">Home</a>
         <span>/</span>
-        <a href={`/?category=${product.category.slug}`} className="hover:text-canal">{product.category.name}</a>
+        <a href={`/category/${product.category.slug}`} className="hover:text-canal">{product.category.name}</a>
         <span>/</span>
         <span className="text-char">{product.name}</span>
       </nav>

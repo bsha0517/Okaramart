@@ -6,6 +6,7 @@ import CategoryCarousel from "@/components/CategoryCarousel";
 import BannerStrip from "@/components/BannerStrip";
 import CategoryProductRow from "@/components/CategoryProductRow";
 import CollectionRow from "@/components/CollectionRow";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -14,48 +15,33 @@ export default async function HomePage({
 }: {
   searchParams: { category?: string; q?: string };
 }) {
+  // Old-style links (?category=slug) redirect to the real category page
+  if (searchParams.category) {
+    redirect(`/category/${searchParams.category}`);
+  }
+
   const categories = await prisma.category.findMany();
-  const activeCategorySlug = searchParams.category;
   const query = searchParams.q?.trim();
 
-  // Search or category-filter view: flat grid, no homepage sections
-  if (query || activeCategorySlug) {
-    const activeCategory = categories.find((c) => c.slug === activeCategorySlug);
+  // Search view: flat grid
+  if (query) {
     const products = await prisma.product.findMany({
       where: {
         isActive: true,
-        ...(activeCategorySlug ? { category: { slug: activeCategorySlug } } : {}),
-        ...(query ? { name: { contains: query, mode: "insensitive" } } : {}),
+        name: { contains: query, mode: "insensitive" },
       },
       take: 60,
     });
-
-    // Subcategory chips if this category has children
-    const subcategories = categories.filter((c) => c.parentId === activeCategory?.id);
 
     return (
       <div className="max-w-6xl mx-auto px-4 py-5">
         <DeliveryEtaBadge />
         <CategoryCarousel categories={categories.filter((c) => !c.parentId)} />
-
-        {subcategories.length > 0 && (
-          <div className="flex gap-2 flex-wrap mb-4">
-            {subcategories.map((sc) => (
-              <a key={sc.id} href={`/?category=${sc.slug}`}
-                className="text-sm border border-canal/20 rounded-full px-3 py-1 text-canal hover:bg-canal/5">
-                {sc.name}
-              </a>
-            ))}
-          </div>
-        )}
-
-        <h2 className="font-display text-xl text-char mb-3">
-          {query ? `Results for "${query}"` : activeCategory?.name}
-        </h2>
+        <h2 className="font-display text-xl text-char mb-3">Results for &quot;{query}&quot;</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
           {products.map((p) => <ProductCard key={p.id} product={p} />)}
           {products.length === 0 && (
-            <p className="col-span-full text-char/60">No products found. Try a different search or category.</p>
+            <p className="col-span-full text-char/60">No products found. Try a different search.</p>
           )}
         </div>
       </div>

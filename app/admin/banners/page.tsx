@@ -12,7 +12,7 @@ export default async function BannersPage() {
       <h1 className="font-display text-2xl text-canal mb-2">Homepage banners</h1>
       <p className="text-char/60 text-sm mb-6">
         These appear as the promo strip on the homepage, in order. Link URL is optional —
-        e.g. <code className="bg-canal/5 px-1 rounded">/?category=snacks</code> to send
+        e.g. <code className="bg-canal/5 px-1 rounded">/category/snacks</code> to send
         customers straight to a category.
       </p>
 
