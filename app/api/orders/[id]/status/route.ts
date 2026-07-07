@@ -52,8 +52,10 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   });
 
   const messageFn = CUSTOMER_MESSAGES[status];
-  if (messageFn) {
-    // Best-effort — don't fail the status update if SMS sending has an issue
+  if (messageFn && updated.customer.phone) {
+    // Best-effort — don't fail the status update if SMS sending has an issue.
+    // Skipped entirely for customers without a phone on file (e.g. some
+    // Google/Facebook signups) — nothing to send it to.
     sendSms(updated.customer.phone, messageFn(updated.orderNumber)).catch(() => {});
   }
 

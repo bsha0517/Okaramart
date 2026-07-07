@@ -32,7 +32,7 @@ export async function getUnifiedCustomerSession(): Promise<CustomerSession | nul
   const nextAuthSession = await getServerSession(authOptions);
   const user = nextAuthSession?.user as any;
   if (user?.role === "CUSTOMER" && user?.id) {
-    return { userId: user.id, phone: user.phone, role: "CUSTOMER" };
+    return { userId: user.id, phone: user.phone ?? undefined, role: "CUSTOMER" };
   }
   return null;
 }
