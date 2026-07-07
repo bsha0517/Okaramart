@@ -38,6 +38,34 @@ role-based admin panel, and JazzCash / EasyPaisa / Cash-on-Delivery checkout.
 
 ## What you still need to do before going live
 
+**New in this round:**
+
+- **Email notifications** at all four order milestones: placed
+  (customer + ops team), confirmed (customer, includes the delivery OTP
+  for COD orders), and delivered (customer). Set up a free
+  [Resend](https://resend.com) account, set `EMAIL_PROVIDER="resend"`,
+  `RESEND_API_KEY`, `EMAIL_FROM`, and `OPERATIONS_EMAIL` in your env vars.
+  Until then, emails just log to the server console — same pattern as
+  SMS.
+- **Fixed a real gap: the delivery OTP was generated but never actually
+  reached the customer anywhere.** It's now shown (a) prominently on the
+  customer's own order page (`/orders/[id]`) for COD orders that haven't
+  been delivered yet, and (b) in the "order confirmed" email.
+- **Cash-collection gate**: marking a COD order "Delivered" now requires
+  an explicit checkbox — "I've collected Rs X cash from the customer" —
+  in addition to the OTP, on both the rider dashboard and the admin
+  order page. This is enforced server-side too, not just hidden in the
+  UI, so a rider or manager can't skip straight to Delivered without
+  confirming cash in hand.
+- **Browser/push notifications** (what's sometimes called "explorer
+  notifications") are a bigger separate feature — they need a service
+  worker, push subscriptions per device, and VAPID keys, which is more
+  infrastructure than email. Not built yet; let me know if you want this
+  as the next thing, since it's a real subsystem rather than a quick
+  addition.
+
+
+
 **New in this round — run `prisma/manual-setup/08_order_fees.sql` in
 Supabase once:**
 

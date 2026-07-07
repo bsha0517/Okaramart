@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { getPaymentProvider } from "@/lib/payments";
 import { getUnifiedCustomerSession } from "@/lib/customerSession";
 import { calculateOrderFees } from "@/lib/fees";
+import { sendEmail, sendOperationsEmail } from "@/lib/email";
+import { orderPlacedEmail, newOrderOpsEmail } from "@/lib/emailTemplates";
 
 export const dynamic = "force-dynamic";
 export const preferredRegion = "sin1"; // match your Supabase region
@@ -149,6 +151,31 @@ export async function POST(req: NextRequest) {
       status: paymentMethod === "COD" ? "PENDING" : "PENDING",
     },
   });
+
+  // Best-effort — email delivery issues shouldn't fail order placement.
+  const emailItems = order.items.map((oi) => ({
+    name: products.find((p) => p.id === oi.productId)?.name ?? "Item",
+    quantity: oi.quantity,
+    unitPrice: Number(oi.unitPrice),
+  }));
+  const orderForEmail = {
+    orderNumber: order.orderNumber,
+    total: Number(order.total),
+    items: emailItems,
+    addressSnapshot: order.addressSnapshot,
+    paymentMethod: order.paymentMethod,
+  };
+
+  if (customer?.email) {
+    const { subject, html } = orderPlacedEmail(orderForEmail);
+    sendEmail(customer.email, subject, html).catch(() => {});
+  }
+  const opsTemplate = newOrderOpsEmail({
+    ...orderForEmail,
+    customerName: customer?.name ?? "Customer",
+    customerPhone: customer?.phone,
+  });
+  sendOperationsEmail(opsTemplate.subject, opsTemplate.html).catch(() => {});
 
   return NextResponse.json({
     orderId: order.id,

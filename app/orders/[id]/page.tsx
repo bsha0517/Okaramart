@@ -159,6 +159,13 @@ export default async function OrderDetailPage({
         </p>
       </div>
 
+      {order.paymentMethod === "COD" && order.otpCode && !isCancelled && !isReturned && order.status !== "DELIVERED" && (
+        <div className="bg-wheat/15 border border-wheat/40 rounded-2xl p-5 mb-5 text-center">
+          <p className="text-sm text-char/70 mb-1">Give this code to your rider once you've handed over the cash</p>
+          <p className="text-3xl font-bold tracking-[0.3em] text-canal">{order.otpCode}</p>
+        </div>
+      )}
+
       {canCancel && <CancelOrderButton orderId={order.id} />}
       {!canCancel && !isCancelled && !isReturned && (
         <p className="text-xs text-char/40 text-center">

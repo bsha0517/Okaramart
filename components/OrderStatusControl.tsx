@@ -25,6 +25,7 @@ export default function OrderStatusControl({
   const [status, setStatus] = useState(currentStatus);
   const [note, setNote] = useState("");
   const [otp, setOtp] = useState("");
+  const [cashCollected, setCashCollected] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,7 +37,12 @@ export default function OrderStatusControl({
     const res = await fetch(`/api/orders/${orderId}/status`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status, note: note || undefined, otp: needsOtp ? otp : undefined }),
+      body: JSON.stringify({
+        status,
+        note: note || undefined,
+        otp: needsOtp ? otp : undefined,
+        cashCollected: needsOtp ? cashCollected : undefined,
+      }),
     });
     const data = await res.json();
     setLoading(false);
@@ -61,13 +67,19 @@ export default function OrderStatusControl({
       </div>
 
       {needsOtp && (
-        <input
-          value={otp}
-          onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-          placeholder="4-digit delivery OTP from customer"
-          maxLength={4}
-          className="w-full border border-canal/20 rounded-lg px-3 py-2 text-sm"
-        />
+        <>
+          <input
+            value={otp}
+            onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+            placeholder="4-digit delivery OTP from customer"
+            maxLength={4}
+            className="w-full border border-canal/20 rounded-lg px-3 py-2 text-sm"
+          />
+          <label className="flex items-center gap-2 text-sm text-char/70">
+            <input type="checkbox" checked={cashCollected} onChange={(e) => setCashCollected(e.target.checked)} />
+            Cash has been collected from the customer
+          </label>
+        </>
       )}
 
       <input
@@ -81,7 +93,7 @@ export default function OrderStatusControl({
 
       <button
         onClick={handleUpdate}
-        disabled={loading || status === currentStatus}
+        disabled={loading || status === currentStatus || (needsOtp && (otp.length !== 4 || !cashCollected))}
         className="bg-canal text-husk text-sm font-semibold rounded-full px-5 py-2 disabled:opacity-50"
       >
         {loading ? "Updating…" : "Update status"}

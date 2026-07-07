@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 export default function RiderOrderCard({ order, mine }: { order: any; mine: boolean }) {
   const router = useRouter();
   const [otp, setOtp] = useState("");
+  const [cashCollected, setCashCollected] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,7 +23,11 @@ export default function RiderOrderCard({ order, mine }: { order: any; mine: bool
     const res = await fetch(`/api/orders/${order.id}/status`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status, otp: status === "DELIVERED" ? otp : undefined }),
+      body: JSON.stringify({
+        status,
+        otp: status === "DELIVERED" ? otp : undefined,
+        cashCollected: status === "DELIVERED" ? cashCollected : undefined,
+      }),
     });
     const data = await res.json();
     setLoading(false);
@@ -61,17 +66,27 @@ export default function RiderOrderCard({ order, mine }: { order: any; mine: bool
       {mine && order.status === "OUT_FOR_DELIVERY" && (
         <div className="space-y-2">
           {order.paymentMethod === "COD" && (
-            <input
-              placeholder="Ask customer for 4-digit code"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-              maxLength={4}
-              className="w-full border border-canal/20 rounded-lg px-3 py-2 text-sm"
-            />
+            <>
+              <input
+                placeholder="Ask customer for 4-digit code"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+                maxLength={4}
+                className="w-full border border-canal/20 rounded-lg px-3 py-2 text-sm"
+              />
+              <label className="flex items-center gap-2 text-sm text-char/70">
+                <input
+                  type="checkbox"
+                  checked={cashCollected}
+                  onChange={(e) => setCashCollected(e.target.checked)}
+                />
+                I've collected Rs {Number(order.total).toFixed(0)} cash from the customer
+              </label>
+            </>
           )}
           <button
             onClick={() => updateStatus("DELIVERED")}
-            disabled={loading || (order.paymentMethod === "COD" && otp.length !== 4)}
+            disabled={loading || (order.paymentMethod === "COD" && (otp.length !== 4 || !cashCollected))}
             className="w-full bg-canal text-husk text-sm font-semibold rounded-full py-2 disabled:opacity-50"
           >
             Mark delivered
