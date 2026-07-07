@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-type Category = { id: string; name: string };
+type Category = { id: string; name: string; label?: string };
 
 type ProductFormValues = {
   id?: string;
@@ -194,7 +194,7 @@ export default function ProductForm({
           >
             <option value="">Select a category</option>
             {categories.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
+              <option key={c.id} value={c.id}>{c.label ?? c.name}</option>
             ))}
           </select>
         </div>

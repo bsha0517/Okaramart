@@ -20,6 +20,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               <a href="/admin/categories" className="block px-3 py-2 rounded-lg hover:bg-canal/5">Categories</a>
             )}
             {["SUPER_ADMIN", "MANAGER"].includes(role) && (
+              <a href="/admin/zones" className="block px-3 py-2 rounded-lg hover:bg-canal/5">Delivery areas</a>
+            )}
+            {["SUPER_ADMIN", "MANAGER"].includes(role) && (
+              <a href="/admin/homepage" className="block px-3 py-2 rounded-lg hover:bg-canal/5">Homepage layout</a>
+            )}
+            {["SUPER_ADMIN", "MANAGER"].includes(role) && (
               <a href="/admin/collections" className="block px-3 py-2 rounded-lg hover:bg-canal/5">Homepage rows</a>
             )}
             {["SUPER_ADMIN", "MANAGER"].includes(role) && (

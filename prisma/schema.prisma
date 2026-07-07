@@ -70,6 +70,9 @@ model Category {
   name     String
   slug     String    @unique
   imageUrl String?
+  parentId String?
+  parent   Category?  @relation("CategoryParent", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryParent")
   products Product[]
 }
 
@@ -252,6 +255,20 @@ model Coupon {
 }
 
 // ---------- DELIVERY ZONES (single city, but Okara has distinct areas) ----------
+
+// Admin-controlled homepage layout. `type` determines what renders:
+// VALUE_PROPS, CATEGORY_CAROUSEL, BANNERS, ALL_COLLECTIONS,
+// ALL_CATEGORY_ROWS, SINGLE_COLLECTION (refId=Collection.id),
+// SINGLE_CATEGORY_ROW (refId=Category.id)
+model HomeSection {
+  id        String   @id @default(cuid())
+  type      String
+  refId     String?
+  title     String?  // optional display-title override
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
 
 model DeliveryZone {
   id          String  @id @default(cuid())

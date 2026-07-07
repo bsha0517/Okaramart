@@ -7,15 +7,27 @@ export const dynamic = "force-dynamic";
 export default async function CategoriesPage() {
   const categories = await prisma.category.findMany({
     orderBy: { name: "asc" },
-    include: { _count: { select: { products: true } } },
+    include: { _count: { select: { products: true } }, parent: true },
   });
+
+  const topLevel = categories.filter((c) => !c.parentId);
+  const childrenByParent = new Map<string, typeof categories>();
+  for (const c of categories) {
+    if (c.parentId) {
+      childrenByParent.set(c.parentId, [...(childrenByParent.get(c.parentId) ?? []), c]);
+    }
+  }
 
   return (
     <div>
-      <h1 className="font-display text-2xl text-canal mb-6">Categories</h1>
+      <h1 className="font-display text-2xl text-canal mb-2">Categories</h1>
+      <p className="text-char/60 text-sm mb-6">
+        Set a parent to make a category a subcategory — it'll appear nested under its
+        parent on the storefront and in this list.
+      </p>
 
       <div className="mb-8">
-        <CategoryForm />
+        <CategoryForm categories={topLevel} />
       </div>
 
       <div className="bg-white rounded-xl border border-canal/10 overflow-hidden">
@@ -30,8 +42,13 @@ export default async function CategoriesPage() {
             </tr>
           </thead>
           <tbody>
-            {categories.map((c) => (
-              <CategoryRow key={c.id} category={c} productCount={c._count.products} />
+            {topLevel.map((c) => (
+              <>
+                <CategoryRow key={c.id} category={c} productCount={c._count.products} />
+                {(childrenByParent.get(c.id) ?? []).map((child) => (
+                  <CategoryRow key={child.id} category={child} productCount={child._count.products} indent />
+                ))}
+              </>
             ))}
             {categories.length === 0 && (
               <tr><td colSpan={5} className="px-4 py-8 text-center text-char/40">No categories yet</td></tr>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function CategoryRow({ category, productCount }: { category: any; productCount: number }) {
+export default function CategoryRow({ category, productCount, indent }: { category: any; productCount: number; indent?: boolean }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -31,7 +31,7 @@ export default function CategoryRow({ category, productCount }: { category: any;
           )}
         </div>
       </td>
-      <td className="px-4 py-3 font-medium">{category.name}</td>
+      <td className="px-4 py-3 font-medium">{indent && <span className="text-char/30 mr-1">└</span>}{category.name}</td>
       <td className="px-4 py-3 text-char/50">{category.slug}</td>
       <td className="px-4 py-3">{productCount}</td>
       <td className="px-4 py-3 text-right">

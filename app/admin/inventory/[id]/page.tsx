@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { getCategoriesForSelect } from "@/lib/categoryTree";
 import ProductForm from "@/components/ProductForm";
 import { notFound } from "next/navigation";
 
@@ -7,7 +8,7 @@ export const dynamic = "force-dynamic";
 export default async function EditProductPage({ params }: { params: { id: string } }) {
   const [product, categories] = await Promise.all([
     prisma.product.findUnique({ where: { id: params.id } }),
-    prisma.category.findMany({ orderBy: { name: "asc" } }),
+    getCategoriesForSelect(),
   ]);
 
   if (!product) notFound();

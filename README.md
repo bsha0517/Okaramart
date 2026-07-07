@@ -38,6 +38,29 @@ role-based admin panel, and JazzCash / EasyPaisa / Cash-on-Delivery checkout.
 
 ## What you still need to do before going live
 
+**New in this round — run `prisma/manual-setup/05_subcategories_and_homepage_builder.sql`
+in Supabase once** (adds subcategories and seeds the default homepage layout):
+
+- **Subcategories** — categories can now have a parent (`/admin/categories`),
+  shown nested in admin and as filter chips under the parent category on
+  the storefront
+- **Homepage layout builder** (`/admin/homepage`) — add, remove, reorder,
+  and hide entire sections of the homepage (value props, category
+  carousel, banners, curated rows, category rows) with no code changes.
+  This is a genuine "rearrange the whole homepage" tool, not just content
+  edits within fixed sections
+- **Delivery areas admin** (`/admin/zones`) — manage delivery zones/fees/
+  ETAs from the UI instead of SQL; powers both the homepage ETA badge and
+  the new public `/delivery-areas` page
+- **Footer pages**: `/delivery-areas`, `/careers`, `/customer-support`,
+  `/privacy-policy`, `/terms-of-use`, `/sell-with-us` — all linked from
+  the footer. Privacy Policy and Terms of Use are genuine placeholder
+  text, not legal advice — have a lawyer review before launch.
+- **Social links** in the footer (Instagram, Facebook, TikTok) — update
+  the placeholder URLs in `components/SocialLinks.tsx` to your real
+  profiles
+
+
 **New in this round — run `prisma/manual-setup/04_product_detail_and_collections.sql`
 in Supabase once** (adds product gallery/brand/highlights fields and the
 Collection tables):
