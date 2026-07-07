@@ -79,6 +79,9 @@ model Product {
   slug          String   @unique
   description   String?
   imageUrl      String?
+  images        String[] @default([]) // gallery — falls back to imageUrl if empty
+  brand         String?
+  attributes    Json?    // flexible highlights table, e.g. {"Material": "Plastic", "Gender": "Unisex"}
   price         Decimal  @db.Decimal(10, 2)
   compareAtPrice Decimal? @db.Decimal(10, 2) // for showing discounts
   unit          String   // "1 kg", "500 ml", "1 pc"
@@ -93,6 +96,28 @@ model Product {
 
   orderItems    OrderItem[]
   reviews       Review[]
+  collectionItems CollectionItem[]
+}
+
+// Manually curated homepage carousel rows (e.g. "Trending", "Combo Offers") —
+// separate from the automatic per-category rows.
+model Collection {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  items     CollectionItem[]
+}
+
+model CollectionItem {
+  id           String     @id @default(cuid())
+  collectionId String
+  collection   Collection @relation(fields: [collectionId], references: [id])
+  productId    String
+  product      Product    @relation(fields: [productId], references: [id])
+  sortOrder    Int        @default(0)
 }
 
 model Review {

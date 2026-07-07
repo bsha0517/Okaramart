@@ -38,6 +38,24 @@ role-based admin panel, and JazzCash / EasyPaisa / Cash-on-Delivery checkout.
 
 ## What you still need to do before going live
 
+**New in this round — run `prisma/manual-setup/04_product_detail_and_collections.sql`
+in Supabase once** (adds product gallery/brand/highlights fields and the
+Collection tables):
+
+- **Product detail pages** (`/product/[slug]`) — image gallery, brand,
+  price with discount %, admin-editable "Highlights" table, description,
+  and disclaimer/support info, matching the Zepto PDP layout
+- **Category management** (`/admin/categories`) — add/delete categories
+  with an icon image, without touching code
+- **Homepage carousel rows** (`/admin/collections`) — curated rows like
+  "Trending Now" separate from the automatic per-category rows; search
+  and add any product to a row from the admin UI
+- **Delivery location picker in the header** — signed-in customers see
+  their saved area; guests get a map picker that stashes the pick and
+  prompts login/signup, then auto-saves it as their address once they
+  authenticate
+
+
 1. **Get real payment credentials.** Apply for JazzCash and EasyPaisa
    merchant accounts (business bank account + NTN required in Pakistan).
    Drop the credentials into `.env`. The integration code matches their

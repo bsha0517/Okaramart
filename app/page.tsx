@@ -5,6 +5,7 @@ import ValuePropStrip from "@/components/ValuePropStrip";
 import CategoryCarousel from "@/components/CategoryCarousel";
 import BannerStrip from "@/components/BannerStrip";
 import CategoryProductRow from "@/components/CategoryProductRow";
+import CollectionRow from "@/components/CollectionRow";
 
 export const dynamic = "force-dynamic";
 
@@ -47,12 +48,20 @@ export default async function HomePage({
   }
 
   // Default homepage: full quick-commerce layout
+  const collections = await prisma.collection.findMany({
+    where: { isActive: true },
+    orderBy: { sortOrder: "asc" },
+    include: { items: { include: { product: true }, orderBy: { sortOrder: "asc" } } },
+  });
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-5">
       <DeliveryEtaBadge />
       <ValuePropStrip />
       <CategoryCarousel categories={categories} />
       <BannerStrip />
+
+      {collections.map((c) => <CollectionRow key={c.id} collection={c} />)}
 
       {categories.map((c) => (
         <CategoryProductRow key={c.id} categoryId={c.id} categoryName={c.name} categorySlug={c.slug} />

@@ -6,6 +6,7 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import CartNavLink from "@/components/CartNavLink";
 import StickyCartBar from "@/components/StickyCartBar";
 import SearchBar from "@/components/SearchBar";
+import LocationSelector from "@/components/LocationSelector";
 
 export const metadata: Metadata = {
   title: "Okara Mart — Groceries delivered fast in Okara",
@@ -24,6 +25,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <p className="font-display text-2xl text-canal tracking-tight leading-none">Okara Mart</p>
               <p className="text-[11px] text-char/50 leading-none mt-0.5">Delivery in minutes*</p>
             </a>
+
+            <LocationSelector isLoggedIn={!!session} />
 
             <Suspense fallback={<div className="flex-1" />}>
               <SearchBar />

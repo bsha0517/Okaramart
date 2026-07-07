@@ -11,6 +11,7 @@ type ProductFormValues = {
   slug: string;
   description: string;
   imageUrl: string;
+  brand: string;
   price: string;
   compareAtPrice: string;
   unit: string;
@@ -25,6 +26,7 @@ const EMPTY: ProductFormValues = {
   slug: "",
   description: "",
   imageUrl: "",
+  brand: "",
   price: "",
   compareAtPrice: "",
   unit: "",
@@ -43,10 +45,14 @@ export default function ProductForm({
   initial,
 }: {
   categories: Category[];
-  initial?: Partial<ProductFormValues>;
+  initial?: Partial<ProductFormValues> & { images?: string[]; attributes?: Record<string, string> };
 }) {
   const router = useRouter();
   const [values, setValues] = useState<ProductFormValues>({ ...EMPTY, ...initial });
+  const [images, setImages] = useState<string[]>(initial?.images ?? []);
+  const [attributes, setAttributes] = useState<{ key: string; value: string }[]>(
+    initial?.attributes ? Object.entries(initial.attributes).map(([key, value]) => ({ key, value })) : []
+  );
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const isEdit = Boolean(values.id);
@@ -76,6 +82,22 @@ export default function ProductForm({
     }
   }
 
+  async function handleGalleryUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setError(null);
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+      const res = await fetch("/api/uploads", { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+      setImages((imgs) => [...imgs, data.url]);
+    } catch (err: any) {
+      setError(`Image upload: ${err.message} — you can paste an image URL below instead.`);
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
@@ -86,6 +108,11 @@ export default function ProductForm({
       slug: values.slug || slugify(values.name),
       description: values.description || undefined,
       imageUrl: values.imageUrl || undefined,
+      images: images.filter((i) => i.trim() !== ""),
+      brand: values.brand || undefined,
+      attributes: attributes.length > 0
+        ? Object.fromEntries(attributes.filter((a) => a.key.trim()).map((a) => [a.key, a.value]))
+        : undefined,
       price: parseFloat(values.price),
       compareAtPrice: values.compareAtPrice ? parseFloat(values.compareAtPrice) : null,
       unit: values.unit,
@@ -156,19 +183,30 @@ export default function ProductForm({
         </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">Category</label>
-        <select
-          required
-          className="w-full border border-canal/20 rounded-lg px-3 py-2"
-          value={values.categoryId}
-          onChange={(e) => update("categoryId", e.target.value)}
-        >
-          <option value="">Select a category</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>{c.name}</option>
-          ))}
-        </select>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium mb-1">Category</label>
+          <select
+            required
+            className="w-full border border-canal/20 rounded-lg px-3 py-2"
+            value={values.categoryId}
+            onChange={(e) => update("categoryId", e.target.value)}
+          >
+            <option value="">Select a category</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Brand (optional)</label>
+          <input
+            placeholder="e.g. Nestlé, Local"
+            className="w-full border border-canal/20 rounded-lg px-3 py-2"
+            value={values.brand}
+            onChange={(e) => update("brand", e.target.value)}
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-3 gap-4">
@@ -245,6 +283,65 @@ export default function ProductForm({
           // eslint-disable-next-line @next/next/no-img-element
           <img src={values.imageUrl} alt="Preview" className="w-20 h-20 object-cover rounded-lg mt-2 border border-canal/10" />
         )}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Additional photos (gallery)</label>
+        <input type="file" accept="image/*" onChange={handleGalleryUpload} className="text-sm mb-2" />
+        {images.length > 0 && (
+          <div className="flex gap-2 flex-wrap mb-2">
+            {images.map((img, i) => (
+              <div key={i} className="relative">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={img} alt={`Gallery ${i + 1}`} className="w-16 h-16 object-cover rounded-lg border border-canal/10" />
+                <button
+                  type="button"
+                  onClick={() => setImages((imgs) => imgs.filter((_, idx) => idx !== i))}
+                  className="absolute -top-1.5 -right-1.5 bg-brick text-white rounded-full w-5 h-5 text-xs flex items-center justify-center"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+        <p className="text-xs text-char/50">Shown as a thumbnail strip on the product page. The main photo above is always included automatically.</p>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Highlights (shown as a details table on the product page)</label>
+        <div className="space-y-2">
+          {attributes.map((attr, i) => (
+            <div key={i} className="flex gap-2">
+              <input
+                placeholder="Label — e.g. Material"
+                value={attr.key}
+                onChange={(e) => setAttributes((a) => a.map((x, idx) => idx === i ? { ...x, key: e.target.value } : x))}
+                className="flex-1 border border-canal/20 rounded-lg px-3 py-2 text-sm"
+              />
+              <input
+                placeholder="Value — e.g. Plastic"
+                value={attr.value}
+                onChange={(e) => setAttributes((a) => a.map((x, idx) => idx === i ? { ...x, value: e.target.value } : x))}
+                className="flex-1 border border-canal/20 rounded-lg px-3 py-2 text-sm"
+              />
+              <button
+                type="button"
+                onClick={() => setAttributes((a) => a.filter((_, idx) => idx !== i))}
+                className="text-brick text-sm px-2"
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={() => setAttributes((a) => [...a, { key: "", value: "" }])}
+          className="text-canal text-sm font-medium mt-2"
+        >
+          + Add highlight
+        </button>
       </div>
 
       <div>

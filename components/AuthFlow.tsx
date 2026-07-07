@@ -66,6 +66,29 @@ export default function AuthFlow({ initialMode = "SIGNUP" }: { initialMode?: "SI
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Verification failed");
+
+      // If they picked a delivery location before logging in, save it now
+      const pending = localStorage.getItem("okaramart_pending_location");
+      if (pending) {
+        try {
+          const loc = JSON.parse(pending);
+          await fetch("/api/addresses/default", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              label: "Current location",
+              addressLine: loc.formattedAddress || "Pinned location",
+              area: loc.formattedAddress?.split(",")[0] || "Okara",
+              lat: loc.lat,
+              lng: loc.lng,
+            }),
+          });
+        } catch {
+          // best-effort — don't block login if this fails
+        }
+        localStorage.removeItem("okaramart_pending_location");
+      }
+
       router.push("/");
       router.refresh();
     } catch (e: any) {
