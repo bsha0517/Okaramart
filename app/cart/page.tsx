@@ -1,10 +1,12 @@
 "use client";
 
 import { useCartStore } from "@/components/cartStore";
+import { SMALL_ORDER_FEE, PLATFORM_FEE, amountToAvoidSmallOrderFee } from "@/lib/fees";
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem } = useCartStore();
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  const remainingToAvoidFee = amountToAvoidSmallOrderFee(subtotal);
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
@@ -16,6 +18,13 @@ export default function CartPage() {
         </p>
       ) : (
         <>
+          {remainingToAvoidFee > 0 && (
+            <div className="bg-wheat/15 border border-wheat/40 rounded-lg px-4 py-3 mb-4 text-sm">
+              Add <span className="font-semibold">Rs {remainingToAvoidFee.toFixed(0)}</span> more to your
+              cart to avoid the Rs {SMALL_ORDER_FEE} small order fee.
+            </div>
+          )}
+
           <div className="space-y-3 mb-6">
             {items.map((item) => (
               <div key={item.productId} className="flex items-center justify-between bg-white rounded-lg border border-canal/10 p-3">
@@ -35,9 +44,22 @@ export default function CartPage() {
             ))}
           </div>
 
-          <div className="flex justify-between font-medium text-lg mb-6">
-            <span>Subtotal</span>
-            <span>Rs {subtotal.toFixed(0)}</span>
+          <div className="space-y-1.5 text-sm mb-6">
+            <div className="flex justify-between text-char/70">
+              <span>Subtotal</span>
+              <span>Rs {subtotal.toFixed(0)}</span>
+            </div>
+            {remainingToAvoidFee === 0 ? null : (
+              <div className="flex justify-between text-char/70">
+                <span>Small order fee</span>
+                <span>Rs {SMALL_ORDER_FEE}</span>
+              </div>
+            )}
+            <div className="flex justify-between text-char/70">
+              <span>Platform fee</span>
+              <span>Rs {PLATFORM_FEE}</span>
+            </div>
+            <p className="text-xs text-char/40">+ delivery fee, calculated at checkout based on your area</p>
           </div>
 
           <a

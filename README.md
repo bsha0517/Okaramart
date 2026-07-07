@@ -38,6 +38,23 @@ role-based admin panel, and JazzCash / EasyPaisa / Cash-on-Delivery checkout.
 
 ## What you still need to do before going live
 
+**New in this round — run `prisma/manual-setup/08_order_fees.sql` in
+Supabase once:**
+
+- **Admin orders are now openable.** `/admin/orders` rows link to
+  `/admin/orders/[id]`, which shows the full order (items, customer,
+  address, payment) and lets a manager/admin change status with one
+  click — including the COD delivery OTP check, same as the rider flow.
+- **Order fees**: a **Rs 80 small order fee** applies when the cart
+  subtotal is below Rs 500, and a **flat Rs 10 platform fee** applies to
+  every order. Both are configurable in one place: `lib/fees.ts`
+  (`SMALL_ORDER_THRESHOLD`, `SMALL_ORDER_FEE`, `PLATFORM_FEE`).
+- The cart and checkout pages both show a nudge — *"Add Rs X more to
+  avoid the small order fee"* — so customers can top up before paying
+  rather than being surprised by it.
+
+
+
 **New in this round:**
 
 - **Fixed the category breadcrumb bug** — clicking a category from a

@@ -124,6 +124,18 @@ export default async function OrderDetailPage({
             <span>Delivery fee</span>
             <span>Rs {Number(order.deliveryFee).toFixed(0)}</span>
           </div>
+          {Number(order.smallOrderFee) > 0 && (
+            <div className="flex justify-between text-char/60">
+              <span>Small order fee</span>
+              <span>Rs {Number(order.smallOrderFee).toFixed(0)}</span>
+            </div>
+          )}
+          {Number(order.platformFee) > 0 && (
+            <div className="flex justify-between text-char/60">
+              <span>Platform fee</span>
+              <span>Rs {Number(order.platformFee).toFixed(0)}</span>
+            </div>
+          )}
           {Number(order.discount) > 0 && (
             <div className="flex justify-between text-canal">
               <span>Discount{order.couponCode ? ` (${order.couponCode})` : ""}</span>

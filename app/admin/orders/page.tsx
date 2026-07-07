@@ -37,8 +37,11 @@ export default async function AdminOrdersPage() {
           </thead>
           <tbody>
             {orders.map((o) => (
-              <tr key={o.id} className="border-t border-canal/5">
-                <td className="px-4 py-3 font-medium">{o.orderNumber}</td>
+              <tr key={o.id} className="border-t border-canal/5 hover:bg-canal/5 cursor-pointer relative">
+                <td className="px-4 py-3 font-medium">
+                  <a href={`/admin/orders/${o.id}`} className="absolute inset-0" aria-hidden />
+                  <a href={`/admin/orders/${o.id}`} className="hover:underline">{o.orderNumber}</a>
+                </td>
                 <td className="px-4 py-3">{o.customer.name}</td>
                 <td className="px-4 py-3">{o.items.length} items</td>
                 <td className="px-4 py-3">Rs {Number(o.total).toFixed(0)}</td>

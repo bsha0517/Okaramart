@@ -176,6 +176,8 @@ model Order {
 
   subtotal        Decimal       @db.Decimal(10, 2)
   deliveryFee     Decimal       @db.Decimal(10, 2) @default(0)
+  smallOrderFee   Decimal       @db.Decimal(10, 2) @default(0) // charged when subtotal is below the minimum threshold
+  platformFee     Decimal       @db.Decimal(10, 2) @default(0) // flat fee on every order
   discount        Decimal       @db.Decimal(10, 2) @default(0)
   total           Decimal       @db.Decimal(10, 2)
 

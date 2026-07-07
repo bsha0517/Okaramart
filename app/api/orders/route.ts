@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getPaymentProvider } from "@/lib/payments";
 import { getUnifiedCustomerSession } from "@/lib/customerSession";
+import { calculateOrderFees } from "@/lib/fees";
 
 export const dynamic = "force-dynamic";
 export const preferredRegion = "sin1"; // match your Supabase region
@@ -82,7 +83,8 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const total = Math.max(subtotal + deliveryFee - discount, 0);
+  const { smallOrderFee, platformFee } = calculateOrderFees(subtotal);
+  const total = Math.max(subtotal + deliveryFee + smallOrderFee + platformFee - discount, 0);
   const orderNumber = generateOrderNumber();
 
   const order = await prisma.$transaction(async (tx) => {
@@ -95,6 +97,8 @@ export async function POST(req: NextRequest) {
         paymentMethod,
         subtotal,
         deliveryFee,
+        smallOrderFee,
+        platformFee,
         discount,
         total,
         couponCode,

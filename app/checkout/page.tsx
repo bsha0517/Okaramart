@@ -3,6 +3,7 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import { useCartStore } from "@/components/cartStore";
+import { calculateOrderFees, amountToAvoidSmallOrderFee } from "@/lib/fees";
 
 const MapLocationPicker = dynamic(() => import("@/components/GoogleMapLocationPicker"), {
   ssr: false,
@@ -35,6 +36,9 @@ export default function CheckoutPage() {
   const [needsLogin, setNeedsLogin] = useState(false);
 
   const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
+  const { smallOrderFee, platformFee } = calculateOrderFees(subtotal);
+  const remainingToAvoidFee = amountToAvoidSmallOrderFee(subtotal);
+  const estimatedTotal = subtotal + smallOrderFee + platformFee;
 
   async function placeOrder() {
     setLoading(true);
@@ -180,9 +184,35 @@ export default function CheckoutPage() {
         </div>
       )}
 
-      <div className="flex justify-between font-medium text-lg mb-6">
-        <span>Total</span>
-        <span>Rs {subtotal.toFixed(0)} + delivery</span>
+      {remainingToAvoidFee > 0 && (
+        <div className="bg-wheat/15 border border-wheat/40 rounded-lg px-4 py-3 mb-4 text-sm">
+          Add Rs {remainingToAvoidFee.toFixed(0)} more to your cart to avoid the small order fee.
+        </div>
+      )}
+
+      <div className="space-y-1.5 text-sm mb-6">
+        <div className="flex justify-between text-char/70">
+          <span>Subtotal</span>
+          <span>Rs {subtotal.toFixed(0)}</span>
+        </div>
+        {smallOrderFee > 0 && (
+          <div className="flex justify-between text-char/70">
+            <span>Small order fee</span>
+            <span>Rs {smallOrderFee.toFixed(0)}</span>
+          </div>
+        )}
+        <div className="flex justify-between text-char/70">
+          <span>Platform fee</span>
+          <span>Rs {platformFee.toFixed(0)}</span>
+        </div>
+        <div className="flex justify-between text-char/70">
+          <span>Delivery fee</span>
+          <span>Calculated after address</span>
+        </div>
+        <div className="flex justify-between font-semibold text-char text-base pt-1 border-t border-canal/10 mt-1">
+          <span>Total (+ delivery)</span>
+          <span>Rs {estimatedTotal.toFixed(0)}</span>
+        </div>
       </div>
 
       {error && <p className="text-brick text-sm mb-4">{error}</p>}
