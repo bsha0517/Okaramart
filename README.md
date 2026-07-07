@@ -144,6 +144,43 @@ Collection tables):
    with placeholder fees. Adjust to your real coverage area and rider
    capacity.
 
+## Google & Facebook login (free — no per-signup cost)
+
+Added as a second customer login option alongside phone+password, since
+OAuth logins genuinely cost nothing per signup (unlike SMS). Buttons are
+on `/login` and `/signup` (same page, `components/AuthFlow.tsx`).
+
+**Setup required before these buttons work:**
+- **Google**: [Google Cloud Console](https://console.cloud.google.com/) →
+  APIs & Services → Credentials → Create OAuth client ID (Web
+  application). Authorized redirect URI:
+  `https://yourdomain.com/api/auth/callback/google`
+- **Facebook**: [developers.facebook.com](https://developers.facebook.com/) →
+  create an app → Settings → Basic, for the Client ID/Secret. Valid OAuth
+  redirect URI: `https://yourdomain.com/api/auth/callback/facebook`
+- Set all four values (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`,
+  `FACEBOOK_CLIENT_ID`, `FACEBOOK_CLIENT_SECRET`) in Vercel's environment
+  variables
+
+**What changed under the hood** (only matters if you're extending this
+later): customer identity used to only come from a custom JWT cookie set
+by phone+password login. Google/Facebook logins go through NextAuth
+instead, which has its own session. Rather than running two completely
+separate customer systems, `lib/customerSession.ts` now exports
+`getUnifiedCustomerSession()`, which checks both and is used everywhere
+a customer needs to be identified (checkout, addresses, account page).
+New Google/Facebook signups are created in the same `User` table with
+`role: "CUSTOMER"`.
+
+**Database change needed**: `phone` on `User` is now optional, since
+Google/Facebook only provide an email, not a phone number. Run
+`prisma/manual-setup/07_phone_optional_for_oauth.sql` once in Supabase.
+
+**One knock-on effect**: JazzCash/EasyPaisa need a mobile number to
+charge, so checkout now asks for one specifically when a Google/Facebook
+customer without a phone on file picks a wallet payment method — Cash on
+Delivery doesn't need it.
+
 ## Customer login: password instead of OTP
 
 Customer signup/login now uses **phone + password** (`/api/auth/password/*`),

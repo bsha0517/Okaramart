@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getCustomerSession } from "@/lib/customerSession";
+import { getUnifiedCustomerSession } from "@/lib/customerSession";
 
 export const dynamic = "force-dynamic";
 export const preferredRegion = "sin1"; // match your Supabase region
@@ -15,7 +15,7 @@ const AddressSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const session = await getCustomerSession();
+  const session = await getUnifiedCustomerSession();
   if (!session) return NextResponse.json({ error: "Please log in first" }, { status: 401 });
 
   const body = await req.json();
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  const session = await getCustomerSession();
+  const session = await getUnifiedCustomerSession();
   if (!session) return NextResponse.json({ error: "Please log in first" }, { status: 401 });
 
   const addresses = await prisma.address.findMany({ where: { userId: session.userId } });

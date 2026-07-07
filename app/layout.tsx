@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import "./globals.css";
-import { getCustomerSession } from "@/lib/customerSession";
+import { getUnifiedCustomerSession } from "@/lib/customerSession";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import CartNavLink from "@/components/CartNavLink";
 import StickyCartBar from "@/components/StickyCartBar";
+import PendingLocationSync from "@/components/PendingLocationSync";
 import SearchBar from "@/components/SearchBar";
 import LocationSelector from "@/components/LocationSelector";
 import SocialLinks from "@/components/SocialLinks";
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const session = await getCustomerSession();
+  const session = await getUnifiedCustomerSession();
 
   return (
     <html lang="en">
@@ -106,6 +107,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
         <WhatsAppButton />
         <StickyCartBar />
+        <PendingLocationSync />
       </body>
     </html>
   );

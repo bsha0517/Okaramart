@@ -15,6 +15,7 @@ export default function CheckoutPage() {
   const { items, clear } = useCartStore();
   const [method, setMethod] = useState<PaymentMethod>("COD");
   const [address, setAddress] = useState({ addressLine: "", area: "" });
+  const [payerPhone, setPayerPhone] = useState("");
   const [coords, setCoords] = useState<{ lat: number; lng: number; formattedAddress?: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,6 +46,12 @@ export default function CheckoutPage() {
       const addressData = await addressRes.json();
       if (!addressRes.ok) throw new Error(addressData.error || "Could not save address");
 
+      if ((method === "JAZZCASH" || method === "EASYPAISA") && !/^03\d{9}$/.test(payerPhone)) {
+        setError("Enter a valid mobile number for JazzCash/EasyPaisa, e.g. 03001234567");
+        setLoading(false);
+        return;
+      }
+
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -52,6 +59,7 @@ export default function CheckoutPage() {
           addressId: addressData.id,
           items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
           paymentMethod: method,
+          payerPhone: payerPhone || undefined,
         }),
       });
       const data = await res.json();
@@ -131,6 +139,19 @@ export default function CheckoutPage() {
           </label>
         ))}
       </div>
+
+      {(method === "JAZZCASH" || method === "EASYPAISA") && (
+        <div className="mb-6">
+          <label className="block text-sm font-medium mb-1">Mobile number for {method === "JAZZCASH" ? "JazzCash" : "EasyPaisa"}</label>
+          <input
+            className="w-full border border-canal/20 rounded-lg px-3 py-2"
+            placeholder="03XXXXXXXXX"
+            value={payerPhone}
+            onChange={(e) => setPayerPhone(e.target.value.replace(/\D/g, ""))}
+            maxLength={11}
+          />
+        </div>
+      )}
 
       <div className="flex justify-between font-medium text-lg mb-6">
         <span>Total</span>

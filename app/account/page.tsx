@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { getCustomerSession } from "@/lib/customerSession";
+import { getUnifiedCustomerSession } from "@/lib/customerSession";
 import { redirect } from "next/navigation";
 import LogoutButton from "@/components/LogoutButton";
 
@@ -11,7 +11,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 export default async function AccountPage() {
-  const session = await getCustomerSession();
+  const session = await getUnifiedCustomerSession();
   if (!session) redirect("/login");
 
   const [user, orders, addresses] = await Promise.all([

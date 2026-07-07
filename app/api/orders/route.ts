@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getPaymentProvider } from "@/lib/payments";
-import { getCustomerSession } from "@/lib/customerSession";
+import { getUnifiedCustomerSession } from "@/lib/customerSession";
 
 export const dynamic = "force-dynamic";
 export const preferredRegion = "sin1"; // match your Supabase region
@@ -14,6 +14,9 @@ const CreateOrderSchema = z.object({
   couponCode: z.string().optional(),
   deliverySlot: z.string().optional(),
   notes: z.string().optional(),
+  // Needed for JazzCash/EasyPaisa when the account (e.g. Google/Facebook
+  // signup) has no phone on file — falls back to the account's phone if set.
+  payerPhone: z.string().regex(/^03\d{9}$/).optional(),
 });
 
 function generateOrderNumber() {
@@ -25,7 +28,7 @@ function generateOtp() {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await getCustomerSession();
+  const session = await getUnifiedCustomerSession();
   if (!session) return NextResponse.json({ error: "Please log in first" }, { status: 401 });
   const customerId = session.userId;
 
@@ -34,7 +37,7 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
-  const { addressId, items, paymentMethod, couponCode, deliverySlot, notes } = parsed.data;
+  const { addressId, items, paymentMethod, couponCode, deliverySlot, notes, payerPhone } = parsed.data;
 
   const address = await prisma.address.findUnique({ where: { id: addressId } });
   if (!address || address.userId !== customerId) {
@@ -130,7 +133,7 @@ export async function POST(req: NextRequest) {
     orderId: order.id,
     orderNumber: order.orderNumber,
     amountPkr: total,
-    customerPhone: customer?.phone ?? "",
+    customerPhone: payerPhone || customer?.phone || "",
   });
 
   await prisma.payment.create({

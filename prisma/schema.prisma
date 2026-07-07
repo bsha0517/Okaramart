@@ -23,7 +23,7 @@ enum Role {
 model User {
   id            String   @id @default(cuid())
   name          String
-  phone         String   @unique
+  phone         String?  @unique
   email         String?  @unique
   passwordHash  String?
   role          Role     @default(CUSTOMER)
