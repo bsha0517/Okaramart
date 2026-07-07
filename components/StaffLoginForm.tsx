@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 export default function StaffLoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -31,8 +30,11 @@ export default function StaffLoginForm() {
     }
 
     const callbackUrl = searchParams.get("callbackUrl") || "/admin";
-    router.push(callbackUrl);
-    router.refresh();
+    // A hard reload here (not router.push) matters: it guarantees the
+    // browser sends the freshly-set session cookie on the very next
+    // request. A client-side navigation can otherwise race the cookie
+    // being committed, which is why sign-in sometimes needed 2-3 tries.
+    window.location.href = callbackUrl;
   }
 
   return (

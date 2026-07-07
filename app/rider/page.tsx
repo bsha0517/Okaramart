@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import RiderOrderCard from "@/components/RiderOrderCard";
+import StaffLogoutButton from "@/components/StaffLogoutButton";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +26,10 @@ export default async function RiderPage() {
 
   return (
     <div className="min-h-screen bg-husk px-4 py-6 max-w-md mx-auto">
-      <h1 className="font-display text-2xl text-canal mb-1">Your deliveries</h1>
+      <div className="flex items-center justify-between mb-1">
+        <h1 className="font-display text-2xl text-canal">Your deliveries</h1>
+        <StaffLogoutButton />
+      </div>
       <p className="text-char/60 text-sm mb-6">Okara Mart rider dashboard</p>
 
       <section className="mb-8">

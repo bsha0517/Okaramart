@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import StaffLogoutButton from "@/components/StaffLogoutButton";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
@@ -42,6 +43,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             )}
           </nav>
           <p className="mt-8 text-xs text-char/40">Signed in as {role}</p>
+          <div className="mt-2">
+            <StaffLogoutButton />
+          </div>
         </aside>
         <main className="flex-1 p-6">{children}</main>
       </div>

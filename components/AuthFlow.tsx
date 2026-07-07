@@ -1,11 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 
 export default function AuthFlow({ initialMode = "SIGNUP" }: { initialMode?: "SIGNUP" | "LOGIN" }) {
-  const router = useRouter();
   const [mode, setMode] = useState<"SIGNUP" | "LOGIN">(initialMode);
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
@@ -68,8 +66,9 @@ export default function AuthFlow({ initialMode = "SIGNUP" }: { initialMode?: "SI
         localStorage.removeItem("okaramart_pending_location");
       }
 
-      router.push("/");
-      router.refresh();
+      // Hard reload (not router.push) guarantees the fresh session cookie
+      // is sent on the next request — avoids needing to sign in twice.
+      window.location.href = "/";
     } catch (e: any) {
       setError(e.message);
     } finally {
